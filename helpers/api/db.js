@@ -8,7 +8,8 @@ mongoose.connect(process.env.MONGODB_URI || serverRuntimeConfig.connectionString
 mongoose.Promise = global.Promise;
 
 export const db = {
-    User: userModel()
+    User: userModel(),
+    Product: productModel()
 };
 
 // mongoose models with schema definitions
@@ -34,4 +35,26 @@ function userModel() {
     });
 
     return mongoose.models.User || mongoose.model('User', schema);
+}
+
+function productModel() {
+    const schema = new Schema({
+        name: { type: String, required: true },
+        description: { type: String, required: true },
+        price: { type: Number, required: true },
+        quantity: { type: Number, required: true }
+    }, {
+        // add createdAt and updatedAt timestamps
+        timestamps: true
+    });
+
+    schema.set('toJSON', {
+        virtuals: true,
+        versionKey: false,
+        transform: function (doc, ret) {
+            delete ret._id;
+        }
+    });
+
+    return mongoose.models.Product || mongoose.model('Product', schema);
 }
